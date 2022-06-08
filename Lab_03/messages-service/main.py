@@ -1,0 +1,11 @@
+from flask import Flask
+app = Flask(__name__)
+
+
+@app.route('/message_service', methods=['GET'])
+def get_data():
+    return "messages-service is not implemented"
+
+
+if __name__ == '__main__':
+    app.run(port=8081)
