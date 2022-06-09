@@ -1,3 +1,3 @@
 # microservices_architecture
 
-#### **Please refer to Lab_01 directory**
+#### **Please refer to Lab_05 directory**
