@@ -1,0 +1,47 @@
+#pyms:
+#  services:
+#    service_discovery:
+#      service: "consul_common"
+#      host: "localhost"
+#      autoregister: true
+#  config:
+#    DEBUG: true
+#    TESTING: false
+#    APP_NAME: "Python Microservice"
+#    APPLICATION_ROOT: ""
+
+
+#version: '3.2'
+#
+#services:
+#
+#  consul:
+#    image: 'consul:latest'
+#    hostname: 'consul_common'
+#    volumes:
+#      - ./consul_common/data:/consul_common/data
+#      - ./consul_common/config:/consul_common/config
+#    environment:
+#      - "CONSUL_LOCAL_CONFIG={\"disable_update_check\": true, \"skip_leave_on_interrupt\": true}"
+#    entrypoint:
+#      - consul_common
+#      - agent
+#      - -server
+#      - -data-dir=/consul_common
+#      - -bootstrap-expect=1
+#      - -ui
+#      - -client=0.0.0.0
+#    ports:
+#      - "8400:8400"
+#      - "8500:8500"
+#      - "8600:8600"
+#
+#  microservice_1:
+#    build: consul_common/
+#    hostname: facade
+#    ports:
+#      - "9000:9000"
+#    links:
+#      - consul
+#    depends_on:
+#      - consul
