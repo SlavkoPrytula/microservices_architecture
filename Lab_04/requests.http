@@ -1,73 +1,72 @@
-GET http://localhost:8080/facade_service
+GET http://localhost:8080/facade
 Accept: text/html
 ###
 
 
-POST http://localhost:8080/facade_service
+POST http://localhost:8080/facade
 Content-Type: application/json
 
-"message_1"
+{"msg":"msg1"}
 ###
 
 
-POST http://localhost:8080/facade_service
+POST http://localhost:8080/facade
 Content-Type: application/json
 
-"message_2"
+{"msg":"msg2"}
 ###
 
 
-POST http://localhost:8080/facade_service
+POST http://localhost:8080/facade
 Content-Type: application/json
 
-"message_3"
+{"msg":"msg3"}
 ###
 
 
-POST http://localhost:8080/facade_service
+POST http://localhost:8080/facade
 Content-Type: application/json
 
-"message_4"
+{"msg":"msg4"}
 ###
 
 
-POST http://localhost:8080/facade_service
+POST http://localhost:8080/facade
 Content-Type: application/json
 
-"message_5"
+{"msg":"msg5"}
 ###
 
 
-POST http://localhost:8080/facade_service
+POST http://localhost:8080/facade
 Content-Type: application/json
 
-"message_6"
+{"msg":"msg6"}
 ###
 
 
-POST http://localhost:8080/facade_service
+POST http://localhost:8080/facade
 Content-Type: application/json
 
-"message_7"
+{"msg":"msg7"}
 ###
 
 
-POST http://localhost:8080/facade_service
+POST http://localhost:8080/facade
 Content-Type: application/json
 
-"message_8"
+{"msg":"msg8"}
 ###
 
 
-POST http://localhost:8080/facade_service
+POST http://localhost:8080/facade
 Content-Type: application/json
 
-"message_9"
+{"msg":"msg9"}
 ###
 
 
-POST http://localhost:8080/facade_service
+POST http://localhost:8080/facade
 Content-Type: application/json
 
-"message_10"
-###
+{"msg":"msg10"}

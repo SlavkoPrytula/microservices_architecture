@@ -1,20 +1,31 @@
-# from ..hazelcast.main import messages
+import argparse
 import hazelcast
-hz_client = hazelcast.HazelcastClient()
-messages = hz_client.get_queue("distributed_messages_queue").blocking()
+from flask import Flask, request
+
+# Flask app
+app = Flask(__name__)
+data = list()
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--port', type=int)
+args = parser.parse_args()
+
+client = hazelcast.HazelcastClient()
+print("Connected to hz clusters")
+
+messages_queue = client.get_queue("my-bounded-queue").blocking()
 
 
-def consumer():
-    items = []
-    while not messages.is_empty():
-        item = messages.take()
-        items.append(item["message"])
-    return items
+@app.route("/messages", methods=['GET', 'POST'])
+def messages():
+    if request.method == 'GET':
+        print(messages_queue.take())
+        while not messages_queue.is_empty():
+            data.append(messages_queue.take())
+            print("Messages Service: ", data[-1])
+        return ",".join(data)
+    return f"{request.method} error!"
 
 
-def producer(message):
-    messages.put(message)
-
-    return {
-        "statusCode": 200
-    }
+if __name__ == "__main__":
+    app.run(host='localhost', port=args.port)

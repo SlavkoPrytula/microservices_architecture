@@ -1,4 +1,4 @@
-# **Lab 03: Microservices using Hazelcast Messaging queue**
+# **Lab 04: Microservices using Hazelcast Messaging queue**
 
 **Author: Yaroslav Prytula**
 
@@ -65,6 +65,7 @@ For more information and further tutorial refer to the [original page](https://h
 Start Hazelcast cluster locally
 
 ```bash
+# x3 times
 cd hazelcast-4.2.5/bin
 bash start.sh
 ```
@@ -84,19 +85,20 @@ hz-start
 
 Facade Service is running locally on the **8080** port
 ```bash
-cd facade-service
-python facade_controller.py  # facade_controller
+python facade-service/main.py --port=8080
 ```
 
+Logging Service is running locally on the **8083, 8084, 8085** ports
 ```bash
-cd logging-service
-python logging_controller.py --port [port]  # ex. python logging_controller.py --port 8004
+python logging-service/main.py --port=8083
+python logging-service/main.py --port=8084
+python logging-service/main.py --port=8085
 ```
 
 Messages Service is running locally on the **8081, 8082** ports
 ```bash
-cd messages-service
-python messages_service.py  # messages_service
+python logging-service/main.py --port=8081
+python logging-service/main.py --port=8082
 ```
 
 <br />

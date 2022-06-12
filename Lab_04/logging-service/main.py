@@ -1,17 +1,43 @@
-# from Lab_04.hazelcast.main import messages
+import argparse
 import hazelcast
+from flask import Flask, request
 
-hz_client = hazelcast.HazelcastClient()
-messages = hz_client.get_map("distributed_messages_map").blocking()
+# Flask app
+app = Flask(__name__)
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--port', type=int)
+args = parser.parse_args()
+
+client = hazelcast.HazelcastClient()
+print("Connected to hz clusters")
+
+messages_map = client.get_map("my-distributed-map").blocking()
 
 
-def get_messages():
-    return messages
+@app.route("/logging", methods=['GET', 'POST'])
+def logging():
+    msg = ''
+
+    if request.method == 'POST':
+        _uuid = str(request.form["uuid"])
+        msg = str(request.form["msg"])
+        print('------', msg)
+        print(f'Logging Service: [uuid: {_uuid}, msg: {msg}]')
+
+        messages_map.lock(_uuid)
+        try:
+            messages_map.put(_uuid, msg)
+        finally:
+            messages_map.unlock(_uuid)
+
+    elif request.method == 'GET':
+        msg = ",".join(list(messages_map.values()))
+
+    return msg
 
 
-def post_message(message_data):
-    messages.put(message_data["message_uuid"], message_data["message"])
+if __name__ == "__main__":
+    app.run(host='localhost', port=args.port)
 
-    return {
-        "statusCode": 200
-    }
+

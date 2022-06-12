@@ -1,60 +1,52 @@
-import random
-from flask import Flask, request
-import requests
+import argparse
+from random import choice
 import uuid
-import json
+import hazelcast
+import requests
+from flask import Flask, request
 
+# Flask app
 app = Flask(__name__)
 
-logging_services = ["http://localhost:8083/logging_service",
-                    "http://localhost:8084/logging_service",
-                    "http://localhost:8085/logging_service"]
+parser = argparse.ArgumentParser()
+parser.add_argument('--port', type=int)
+args = parser.parse_args()
 
-message_services = ["http://localhost:8081/message_service",
-                    "http://localhost:8082/message_service"]
+client = hazelcast.HazelcastClient()
+print("Connected to hz clusters")
 
-
-@app.route('/facade_service', methods=['GET'])
-def get_data():
-    logging_service = random.choice(logging_services)
-    message_service = random.choice(message_services)
-
-    logging_service_data = requests.get(logging_service).text
-    message_service_data = requests.get(message_service).text
-    data = f'{logging_service_data}: {message_service_data}'
-
-    return data
+messages_queue = client.get_queue("my-bounded-queue").blocking()
 
 
-@app.route('/facade_service', methods=['POST'])
-def post_message():
-    message = request.get_json()
-    message_uuid = str(uuid.uuid4())
+logging_services = ["http://localhost:8083/logging",
+                    "http://localhost:8084/logging",
+                    "http://localhost:8085/logging"]
 
-    data = {
-        "message": message,
-        "message_uuid": message_uuid
-    }
-
-    logging_service = random.choice(logging_services)
-    messages_service = random.choice(message_services)
-
-    response_logging = requests.post(url=logging_service,
-                                     data=json.dumps(data),
-                                     headers={"Content-Type": "application/json"}
-                                     )
-    response_messages = requests.post(url=messages_service,
-                                      data=json.dumps(data),
-                                      headers={"Content-Type": "application/json"}
-                                      )
-
-    return {
-        "statusCode logging service": response_logging.status_code,
-        "statusCode message service": response_messages.status_code,
-    }
+message_services = ["http://localhost:8081/messages",
+                    "http://localhost:8082/messages"]
 
 
-if __name__ == '__main__':
-    app.run(port=8080)
+@app.route("/facade", methods=['POST', 'GET'])
+def facade():
+    if request.method == 'POST':
+        # message service
+        _msg = request.json.get("msg", None)
+        messages_queue.put(f"{_msg}")
+
+        # logging service
+        msg = {"uuid": uuid.uuid4(), "msg": _msg}
+        response = requests.post(choice(logging_services), data=msg)
+        return response.text
+
+    elif request.method == 'GET':
+        # messages from logging service
+        logging_response = requests.get(choice(logging_services))
+
+        # responses from messages service
+        messages_response = requests.get(choice(message_services))
+
+        return f"Logging Service:\t{logging_response}\nMessages Service:\t{messages_response}"
 
 
+if __name__ == "__main__":
+    app.run(host='localhost', port=args.port)
